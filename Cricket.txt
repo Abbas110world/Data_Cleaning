@@ -1,0 +1,244 @@
+0) Make the CSV using Import from web using the link:
+      https://www.espncricinfo.com/records/highest-career-batting-average-282910
+      Make some values as Duplicates
+
+1) Import CSV
+
+2) Change Column names
+      df=df.rename(columns={"Mat":"Matches,"NO":"Not_Outs"})
+
+3) Check null 
+      df.isnull().any()
+
+4) Check null specifically for those columns 
+      df[df["Balls_faced"].isna()==1]
+
+5) Fill Null values
+      df["Balls_faced"]=df["Balls_faced"].fillna()
+
+6) Let's Cross check the values whether filled or not
+      df[df["Player"]=="ED Weekes (WI)"]
+
+7) Check for Duplicates
+      df.duplicated()
+
+8) Let's Check which rows are duplicated
+      df[df["Player"].duplicated()==1]
+     
+9) Let's see how many of these players row are duplicated
+      df[df["Players"].isin(["Ga Headley (WI)", "GS Sobers (WI)","JB Hobs (Eng)",
+                                       "V Kohli (Ind)"])]
+
+10) Let's drop Duplicates
+      df.drop_duplicates()
+
+11) Let's check if we are left with any duplicate values
+      df.duplicated()
+     
+      df[df["Players"].isin(["Ga Headley (WI)", "GS Sobers (WI)","JB Hobs (Eng)",
+                                       "V Kohli (Ind)"])]
+
+12) Let's create new column from existing ones:
+
+      12(i)  Let's make SPAN column split between two new columns
+
+
+             df["span"].str.split('-')
+
+             df["span"].str.split('-').str[0]
+             df["span"].str.split('-').str[1]
+
+         a)  df["Starting_Year"]=df["span"].str.split('-').str[0]
+         b)  df["Ending_Year"]=df["span"].str.split('-').str[1]
+
+        
+         c) Let's delete "SPAN" column now
+
+               df = df.drop(['Span'], axis=1)
+
+      12(ii)  Let's Split Country from the respective player's name
+
+          a)  df['Player'].str.split('(').str[1]
+
+          b)  df['Country'] = df['Player'].str.split('(').str[1]
+          c)  df['Country'] = df['Player'].str.split(')').str[0]
+
+          d) Let's check "COUNTRY" now
+              df['Country']
+
+          e) Let's make 'PLAYERS' column, with 'Players' name only
+
+              df['Players'] = df['Players'].str.split('(').str[0]
+
+
+13)  Let's check and make correct data type
+          df.dtypes
+
+     We can see many columns has data type problems
+
+
+14)  Let's start correcting these columns one by one:
+
+   
+    14(i)   df['Highest_Inns_Score']
+    
+    14(ii)  df['Highest_Inns_Score'].str.split('*').str[0]
+
+    14(iii) df['Highest_Inns_Score'] = df['Highest_Inns_Score'].str.split('*').str[0]
+
+
+
+
+    14(iv)  Now let's change its data type to integer
+                df['Highest_Inns_Score'].astype('int')
+
+     14(v)  Let's check data type again to confirm
+                df.dtypes
+
+     14(vi) Let's change all the columns data type all at once
+                df = df.astype({Starting_Year:'int', 'Ending_Year':'int'})
+
+     14(vii) Let's check all data type again
+                df.dtypes
+
+     14(viii) Let's deal with MATCHES column as it has *
+
+              df['Matches'] = df['Matches'].str.split('*').str[]
+              
+     14(ix)  Now * has been removed, so let's change the data type to float now
+              df['Matches'] = df['Matches'].astype('int')
+
+
+     14(x)   Now let's check the whether data type has changed or not
+              df.dtypes()
+              
+
+     14(xi) Let's deal with the Column BALLS FACED now, since it has a + (like this 952+)
+              df['Balls_Faced'] = df['Balls_Faced'].str.split('+').str[0]
+
+
+     14(xii) Now let's chane the data type to int for column BALLS FACED from object
+                df['Balls_Faced'] = df['Balls_Faced'].astype('int')
+
+
+---------------> It is showing an error that it has a null value, let's check:
+
+
+     14(xiii) Let's check for Null Values in BALLS_FACED
+                df[df['Balls_Faced'].isna()==1] 
+
+                (Yes, after splitting we have a Null value) 
+
+
+     14(xiv)  Let's deal with Null value
+                 df['Balls_Faced']=df['Balls_Faced'].fillna(...)
+
+
+     14(xv)  Let's Check again
+                 df[df['Balls_Faced'].isna()==1] 
+
+ -----------------> Let's try to convert the column BALLS FACED to integer data type
+
+
+     14(xvi) Change data type to int now
+               df['Balls_Faced'] = df["Balls_Faced].astype('int')
+
+
+         It is showing error, as there are some string values in it. It says, it has some NaN values,
+         let's check them.
+
+   
+     14(xvii) df[df["Balls_Faced"].isna()==1]
+
+
+         Let's fill those NaN
+
+ 
+     14(xviii) df["Balls_Faced"]=df["Balls_Faced"].fillna(0)
+
+
+         Let's Check again
+
+
+     14(xix)  df[df["Balls_Faced"].isna()==1]
+
+
+     14(xx) Let's convert it to integer now:
+
+              df['Balls_Faced'] = df["Balls_Faced].astype('int')
+
+
+              Still an error, because it has --
+
+
+     14(xxi) Let's drop this row:
+
+               df = df.drop(56, axis=0)
+
+
+     14(xxii) Let's change it finally to integer
+
+              df['Balls_Faced'] = df["Balls_Faced].astype('int')
+
+
+
+     14(xxiii)  Let's change data type of Strike Rate column to float
+
+              df["Strike Rate"]=df["Strike Rate].astype('float')
+
+
+
+   15) Lets add a column named, Career Length:
+
+
+             df["Career_Length"] = df["Rookie_Year"] - df["Current_Year"]
+.........................................................................................
+
+Q1) What is average Career Length?
+
+        df["Career_Length"].mean()
+
+
+Q2) Average Batting strike rate for players who played for more than 10 years
+
+        df[df["Career_Length"]>10]["Strike_Rate"].mean()
+
+
+Q3) Find out players who played before 1960
+
+        df[df["Rookie_Year"]<1960]["Players"]
+
+        df[df["Rookie_Year"]<1960].count()
+
+
+Q4)  Maximum Highest Innigns Score by Country
+
+        df.groupby("Country")['Highest_Innings_Score'].max().sort_values(ascending=False)
+
+
+Q5) Average 100,50 and ducks by country
+
+
+       df.groupby("Country")[['100','50','0']].mean()
+           
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+             
+  
